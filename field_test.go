@@ -55,7 +55,7 @@ func TestFieldElementFromOneBytes3(t *testing.T) {
 	}
 }
 
-func TestFieldELementToBytes1(t *testing.T) {
+func TestFieldElementToBytes1(t *testing.T) {
 	bytes := []byte{
 		100, 200,
 	}
@@ -68,7 +68,7 @@ func TestFieldELementToBytes1(t *testing.T) {
 	}
 }
 
-func TestFieldELementToBytes2(t *testing.T) {
+func TestFieldElementToBytes2(t *testing.T) {
 	in := []byte{
 		0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
 		0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x10, 0x20,
@@ -83,7 +83,7 @@ func TestFieldELementToBytes2(t *testing.T) {
 	}
 }
 
-func TestFieldELementToBytes3(t *testing.T) {
+func TestFieldElementToBytes3(t *testing.T) {
 	in := []byte{
 		0x11, 0x22, 0x33, 0x55, 0x66, 0x77, 0x88,
 		0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x10, 0x20,
