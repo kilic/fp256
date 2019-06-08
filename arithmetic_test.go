@@ -1,44 +1,8 @@
 package fp
 
 import (
-	"encoding/binary"
-	"encoding/hex"
-	"fmt"
 	"testing"
 )
-
-type hexstr string
-
-func (s hexstr) uints4() [4]uint64 {
-	if s[:2] == "0x" {
-		s = s[2:]
-	}
-	r := new([4]uint64)
-	for i := 0; i < 4; i++ {
-		bs, _ := hex.DecodeString(string(s[(3-i)*16 : (4-i)*16]))
-		r[i] = binary.BigEndian.Uint64(bs)
-	}
-	return *r
-}
-
-func (s hexstr) uints8() [8]uint64 {
-	if s[:2] == "0x" {
-		s = s[2:]
-	}
-	r := new([8]uint64)
-	for i := 0; i < 8; i++ {
-		bs, _ := hex.DecodeString(string(s[(7-i)*16 : (8-i)*16]))
-		r[i] = binary.BigEndian.Uint64(bs)
-	}
-	return *r
-}
-
-func hexString(e []uint64) (r string) {
-	for i := len(e); i > 0; i-- {
-		r = r + fmt.Sprintf("%16.16x", e[i-1])
-	}
-	return
-}
 
 func TestSinglePrecisionMultiplication(t *testing.T) {
 	var a uint64 = 0xaabbccdd1111111c
