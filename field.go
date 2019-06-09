@@ -108,6 +108,19 @@ func (f *Field) Mul(c, a, b *FieldElement) {
 	montmul(c, a, b)
 }
 
+// Sets c as (a^e) modp
+func (f *Field) Exp(c, a, x *FieldElement) {
+	z := new(FieldElement).set(f.r1) // A
+	var i uint64
+	for i = 255; i != 0xffffffffffffffff; i-- {
+		montmul(z, z, z)
+		if x.bit(i) {
+			montmul(z, z, a)
+		}
+	}
+	c.set(z)
+}
+
 // Guide to Elliptic Curve Cryptography Algorithm
 // Hankerson, Menezes, Vanstone
 // Algoritm 2.22 Binary algorithm for inversion in Fp

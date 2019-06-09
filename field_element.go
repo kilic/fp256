@@ -109,3 +109,10 @@ func (fe *FieldElement) leftShift() uint64 {
 	fe[0] = fe[0] << 1
 	return e
 }
+
+func (fe *FieldElement) bit(i uint64) bool {
+	k := i >> 6
+	i = i - k<<6
+	b := (fe[k] >> i) & 0x0000000000000001
+	return b != 0
+}
