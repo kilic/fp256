@@ -8,7 +8,7 @@ import (
 var nBox = 100000
 
 func TestBoxFieldELementByteInOut(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b = new(FieldElement), new(FieldElement)
 	bytes := make([]byte, 32)
@@ -20,12 +20,13 @@ func TestBoxFieldELementByteInOut(t *testing.T) {
 		if !b.eq(a) {
 			t.Errorf("bad byte conversion in:%s, out:%s",
 				a.String(), b.String())
+			return
 		}
 	}
 }
 
 func TestBoxAdditiveAssoc(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c, u, v FieldElement
 	for i := 0; i < nBox; i++ {
@@ -39,12 +40,13 @@ func TestBoxAdditiveAssoc(t *testing.T) {
 		if !u.eq(&v) {
 			t.Errorf("additive associativity does not hold a:%s, b:%s, c:%s, u:%s, v:%s",
 				a.String(), b.String(), c.String(), u.String(), v.String())
+			return
 		}
 	}
 }
 
 func TestBoxSubractiveAssoc(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c, u, v FieldElement
 	for i := 0; i < nBox; i++ {
@@ -58,12 +60,13 @@ func TestBoxSubractiveAssoc(t *testing.T) {
 		if !u.eq(&v) {
 			t.Errorf("subtractive associativity does not hold a:%s, b:%s, c:%s, u:%s, v:%s",
 				a.String(), b.String(), c.String(), u.String(), v.String())
+			return
 		}
 	}
 }
 
 func TestBoxMultiplicativeAssoc(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c, u, v FieldElement
 	for i := 0; i < nBox; i++ {
@@ -77,12 +80,13 @@ func TestBoxMultiplicativeAssoc(t *testing.T) {
 		if !u.eq(&v) {
 			t.Errorf("multiplicative associativity does not hold a:%s, b:%s, c:%s, u:%s, v:%s",
 				a.String(), b.String(), c.String(), u.String(), v.String())
+			return
 		}
 	}
 }
 
 func TestBoxAdditiveCommutativity(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, u, v FieldElement
 	for i := 0; i < nBox; i++ {
@@ -93,12 +97,13 @@ func TestBoxAdditiveCommutativity(t *testing.T) {
 		if !u.eq(&v) {
 			t.Errorf("additive commutativity  does not hold a:%s, b:%s, u:%s",
 				a.String(), b.String(), u.String())
+			return
 		}
 	}
 }
 
 func TestBoxMultiplicativeCommutativity(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, u, v FieldElement
 	for i := 0; i < nBox; i++ {
@@ -109,12 +114,28 @@ func TestBoxMultiplicativeCommutativity(t *testing.T) {
 		if !u.eq(&v) {
 			t.Errorf("multiplicative commutativity does not hold a:%s, b:%s, u:%s",
 				a.String(), b.String(), u.String())
+			return
+		}
+	}
+}
+
+func TestBoxSquare(t *testing.T) {
+	p := bigFromStr16(testmodulus)
+	field := NewField(p)
+	var a, b, c FieldElement
+	for i := 0; i < nBox; i++ {
+		field.RandElement(&a, rand.Reader)
+		field.Square(&b, &a)
+		field.Mul(&c, &a, &a)
+		if !c.eq(&b) {
+			t.Errorf("bad squaring, have: %s, want: %s", c.String(), b.String())
+			return
 		}
 	}
 }
 
 func TestBoxNegation(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, u, v FieldElement
 	for i := 0; i < nBox; i++ {
@@ -127,12 +148,13 @@ func TestBoxNegation(t *testing.T) {
 		if !u.eq(&v) {
 			t.Errorf("subtraction check does not hold a:%s, b:%s, u:%s",
 				a.String(), b.String(), u.String())
+			return
 		}
 	}
 }
 
 func TestBoxNegation2(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c FieldElement
 	var zero = &FieldElement{0, 0, 0, 0}
@@ -143,12 +165,13 @@ func TestBoxNegation2(t *testing.T) {
 		if !zero.eq(&c) {
 			t.Errorf("bad negation a:%s, b:%s",
 				a.String(), b.String())
+			return
 		}
 	}
 }
 
 func TestBoxDoubling(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c, monttwo FieldElement
 	field.Mul(&monttwo, &FieldElement{2, 0, 0, 0}, field.r2)
@@ -159,13 +182,14 @@ func TestBoxDoubling(t *testing.T) {
 		if !b.eq(&c) {
 			t.Errorf("bad doubling c:%s, b:%s",
 				c.String(), b.String())
+			return
 		}
 	}
 }
 
 func TestBoxAdditiveIdentity(t *testing.T) {
 
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, c FieldElement
 	identity := &FieldElement{0, 0, 0, 0}
@@ -174,17 +198,19 @@ func TestBoxAdditiveIdentity(t *testing.T) {
 		field.Add(&c, &a, identity)
 		if !c.eq(&a) {
 			t.Errorf("additive identity does not hold, have: %s, want: %s", c.String(), a.String())
+			return
 		}
 		field.Add(&a, &c, identity)
 		if !c.eq(&a) {
 			t.Errorf("additive identity does not hold, have: %s, want: %s", c.String(), a.String())
+			return
 		}
 	}
 }
 
 func TestBoxMultiplicativeIdentity(t *testing.T) {
 
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, c FieldElement
 	identity := field.r1
@@ -193,16 +219,18 @@ func TestBoxMultiplicativeIdentity(t *testing.T) {
 		field.Mul(&c, &a, identity)
 		if !c.eq(&a) {
 			t.Errorf("multiplicative identity does not hold, have: %s, want: %s", c.String(), a.String())
+			return
 		}
 		field.Mul(&a, &c, identity)
 		if !c.eq(&a) {
 			t.Errorf("multiplicative identity does not hold, have: %s, want: %s", c.String(), a.String())
+			return
 		}
 	}
 }
 
 func TestBoxInverseDown(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c FieldElement
 	e := &FieldElement{1, 0, 0, 0}
@@ -212,12 +240,13 @@ func TestBoxInverseDown(t *testing.T) {
 		field.Mul(&c, &b, &a)
 		if !c.eq(e) {
 			t.Errorf("bad montgomery downgrade inversion have: %s, want: %s", c.String(), e.String())
+			return
 		}
 	}
 }
 
 func TestBoxInverse(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
+	p := bigFromStr16(testmodulus)
 	field := NewField(p)
 	var a, b, c FieldElement
 	e := field.r1
@@ -227,20 +256,7 @@ func TestBoxInverse(t *testing.T) {
 		field.Mul(&c, &b, &a)
 		if !c.eq(e) {
 			t.Errorf("bad montgomery upgrade inversion, have: %s, want: %s", c.String(), e.String())
-		}
-	}
-}
-
-func TestBoxSquare(t *testing.T) {
-	p := bigFromStr16("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")
-	field := NewField(p)
-	var a, b, c FieldElement
-	for i := 0; i < nBox; i++ {
-		field.RandElement(&a, rand.Reader)
-		field.Square(&b, &a)
-		field.Mul(&c, &a, &a)
-		if !c.eq(&b) {
-			t.Errorf("bad squaring, have: %s, want: %s", c.String(), b.String())
+			return
 		}
 	}
 }

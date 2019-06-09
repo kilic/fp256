@@ -1,21 +1,142 @@
+// +build !amd64, pure_go
+
 package fp
 
-func add64(a, b, cin uint64) (sum, cout uint64) {
-	// assumes cin = {1,0}
-	sum = a + b + cin
-	cout = (b&a | (b|a)&^sum)
-	return
+func add(c, a, b *FieldElement) {
+	a0 := a[0]
+	a1 := a[1]
+	a2 := a[2]
+	a3 := a[3]
+	b0 := b[0]
+	b1 := b[1]
+	b2 := b[2]
+	b3 := b[3]
+	p0 := modulus[0]
+	p1 := modulus[1]
+	p2 := modulus[2]
+	p3 := modulus[3]
+	var e, e2, ne uint64
+
+	u0 := a0 + b0
+	e = (a0&b0 | (a0|b0)&^u0) >> 63
+	u1 := a1 + b1 + e
+	e = (a1&b1 | (a1|b1)&^u1) >> 63
+	u2 := a2 + b2 + e
+	e = (a2&b2 | (a2|b2)&^u2) >> 63
+	u3 := a3 + b3 + e
+	e = (a3&b3 | (a3|b3)&^u3) >> 63
+
+	v0 := u0 - p0
+	e2 = (^u0&p0 | (^u0|p0)&v0) >> 63
+	v1 := u1 - p1 - e2
+	e2 = (^u1&p1 | (^u1|p1)&v1) >> 63
+	v2 := u2 - p2 - e2
+	e2 = (^u2&p2 | (^u2|p2)&v2) >> 63
+	v3 := u3 - p3 - e2
+	e2 = (^u3&p3 | (^u3|p3)&v3) >> 63
+
+	e = e - e2
+	ne = ^e
+
+	c[0] = (u0 & e) | (v0 & ne)
+	c[1] = (u1 & e) | (v1 & ne)
+	c[2] = (u2 & e) | (v2 & ne)
+	c[3] = (u3 & e) | (v3 & ne)
 }
 
-func sub64(a, b, bin uint64) (diff, bout uint64) {
-	// asumes bin = {1,0}
-	diff = a - (b + bin)
-	bout = (^a&b | (^a|b)&diff)
-	return
+func double(c, a *FieldElement) {
+	a0 := a[0]
+	a1 := a[1]
+	a2 := a[2]
+	a3 := a[3]
+	p0 := modulus[0]
+	p1 := modulus[1]
+	p2 := modulus[2]
+	p3 := modulus[3]
+
+	e := a3 >> 63
+	u3 := a3<<1 | a2>>63
+	u2 := a2<<1 | a1>>63
+	u1 := a1<<1 | a0>>63
+	u0 := a0 << 1
+
+	v0 := u0 - p0
+	e2 := (^u0&p0 | (^u0|p0)&v0) >> 63
+	v1 := u1 - p1 - e2
+	e2 = (^u1&p1 | (^u1|p1)&v1) >> 63
+	v2 := u2 - p2 - e2
+	e2 = (^u2&p2 | (^u2|p2)&v2) >> 63
+	v3 := u3 - p3 - e2
+	e2 = (^u3&p3 | (^u3|p3)&v3) >> 63
+
+	e = e - e2
+	ne := ^e
+
+	c[0] = (u0 & e) | (v0 & ne)
+	c[1] = (u1 & e) | (v1 & ne)
+	c[2] = (u2 & e) | (v2 & ne)
+	c[3] = (u3 & e) | (v3 & ne)
+}
+
+func sub(c, a, b *FieldElement) {
+	a0 := a[0]
+	a1 := a[1]
+	a2 := a[2]
+	a3 := a[3]
+	b0 := b[0]
+	b1 := b[1]
+	b2 := b[2]
+	b3 := b[3]
+	p0 := modulus[0]
+	p1 := modulus[1]
+	p2 := modulus[2]
+	p3 := modulus[3]
+
+	var e, e2, ne uint64
+
+	u0 := a0 - b0
+	e = (^a0&b0 | (^a0|b0)&u0) >> 63
+	u1 := a1 - b1 - e
+	e = (^a1&b1 | (^a1|b1)&u1) >> 63
+	u2 := a2 - b2 - e
+	e = (^a2&b2 | (^a2|b2)&u2) >> 63
+	u3 := a3 - b3 - e
+	e = (^a3&b3 | (^a3|b3)&u3) >> 63
+
+	v0 := u0 + p0
+	e2 = (u0&p0 | (u0|p0)&^v0) >> 63
+	v1 := u1 + p1 + e2
+	e2 = (u1&p1 | (u1|p1)&^v1) >> 63
+	v2 := u2 + p2 + e2
+	e2 = (u2&p2 | (u2|p2)&^v2) >> 63
+	v3 := u3 + p3 + e2
+
+	e--
+	ne = ^e
+	c[0] = (u0 & e) | (v0 & ne)
+	c[1] = (u1 & e) | (v1 & ne)
+	c[2] = (u2 & e) | (v2 & ne)
+	c[3] = (u3 & e) | (v3 & ne)
+}
+
+func neg(c, a *FieldElement) {
+	sub(c, modulus, a)
+}
+
+func montmul(c, a, b *FieldElement) {
+	w := [8]uint64{0, 0, 0, 0, 0, 0, 0, 0}
+	mul256(&w, a, b)
+	mont(c, &w)
+}
+
+func montsquare(c, a *FieldElement) {
+	w := [8]uint64{0, 0, 0, 0, 0, 0, 0, 0}
+	square256(&w, a)
+	mont(c, &w)
 }
 
 // https://github.com/golang/go/blob/master/src/math/bits/bits.go
-func mul64_g(a, b uint64) (hi, lo uint64) {
+func mul64(a, b uint64) (hi, lo uint64) {
 	const mask32 = 1<<32 - 1
 	a0 := a & mask32
 	a1 := a >> 32
@@ -33,53 +154,12 @@ func mul64_g(a, b uint64) (hi, lo uint64) {
 
 func square64(a uint64) (hi, lo uint64) {
 	return mul64(a, a)
-	// const mask32 = 1<<32 - 1
-	// a0 := a & mask32
-	// a1 := a >> 32
-	// w0 := a0 * a0
-	// t := a1*a0 + w0>>32
-	// w1 := t & mask32
-	// w2 := t >> 32
-	// w1 += a0 * a1
-	// hi = a1*a1 + w2 + w1>>32
-	// lo = a * a
-	// return
-}
-
-func add256(a [4]uint64, b [4]uint64) ([4]uint64, uint64) {
-	var e uint64
-	a0, a1, a2, a3 := a[0], a[1], a[2], a[3]
-	b0, b1, b2, b3 := b[0], b[1], b[2], b[3]
-	r0 := a0 + b0
-	e = (a0&b0 | (a0|b0)&^r0) >> 63
-	r1 := a1 + b1 + e
-	e = (a1&b1 | (a1|b1)&^r1) >> 63
-	r2 := a2 + b2 + e
-	e = (a2&b2 | (a2|b2)&^r2) >> 63
-	r3 := a3 + b3 + e
-	e = (a3&b3 | (a3|b3)&^r3) >> 63
-	return [4]uint64{r0, r1, r2, r3}, e
-}
-
-func sub256(a, b [4]uint64) (diff [4]uint64, e uint64) {
-	a0, a1, a2, a3 := a[0], a[1], a[2], a[3]
-	b0, b1, b2, b3 := b[0], b[1], b[2], b[3]
-
-	diff0 := a0 - b0
-	e = (^a0&b0 | (^a0|b0)&diff0) >> 63
-	diff1 := a1 - b1 - e
-	e = (^a1&b1 | (^a1|b1)&diff1) >> 63
-	diff2 := a2 - b2 - e
-	e = (^a2&b2 | (^a2|b2)&diff2) >> 63
-	diff3 := a3 - b3 - e
-	e = (^a3&b3 | (^a3|b3)&diff3) >> 63
-	return [4]uint64{diff0, diff1, diff2, diff3}, e
 }
 
 // Handbook of Applied Cryptography
 // Hankerson, Menezes, Vanstone
 // 14.12 Algorithm Multiple-precision multiplication
-func mul256(w *[8]uint64, a [4]uint64, b [4]uint64) {
+func mul(w *[8]uint64, a, b *FieldElement) {
 
 	var w0, w1, w2, w3, w4, w5, w6, w7 uint64
 	var a0 = a[0]
@@ -207,7 +287,7 @@ func mul256(w *[8]uint64, a [4]uint64, b [4]uint64) {
 // Handbook of Applied Cryptography
 // Hankerson, Menezes, Vanstone
 // 14.16 Algorithm Multiple-precision squaring
-func square256(w *[8]uint64, a [4]uint64) {
+func square256(w *[8]uint64, a *FieldElement) {
 
 	var w0, w1, w2, w3, w4, w5, w6, w7 uint64
 	var u, v, c, vv, uu, z1, z2, z3, e uint64
@@ -321,4 +401,179 @@ func square256(w *[8]uint64, a [4]uint64) {
 	w[5] = w5
 	w[6] = w6
 	w[7] = w7
+}
+
+// Reduces T as T (R^-1) modp
+// Handbook of Applied Cryptography
+// Hankerson, Menezes, Vanstone
+// Algorithm 14.32 Montgomery reduction
+func mont(c *FieldElement, w *[8]uint64) {
+	w0 := w[0]
+	w1 := w[1]
+	w2 := w[2]
+	w3 := w[3]
+	w4 := w[4]
+	w5 := w[5]
+	w6 := w[6]
+	w7 := w[7]
+	p0 := modulus[0]
+	p1 := modulus[1]
+	p2 := modulus[2]
+	p3 := modulus[3]
+	var e1, e2, el, res uint64
+	var t1, t2, u uint64
+
+	// i = 0
+	u = w0 * inp
+	//
+	e1, res = mul64(u, p0)
+	t1 = res + w0
+	e1 += (res&w0 | (res|w0)&^t1) >> 63
+	w0 = t1
+	//
+	e2, res = mul64(u, p1)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w1
+	e2 += (t1&w1 | (t1|w1)&^t2) >> 63
+	w1 = t2
+	//
+	e1, res = mul64(u, p2)
+	t1 = res + e2
+	e1 += (res&e2 | (res|e2)&^t1) >> 63
+	t2 = t1 + w2
+	e1 += (t1&w2 | (t1|w2)&^t2) >> 63
+	w2 = t2
+	//
+	e2, res = mul64(u, p3)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w3
+	e2 += (t1&w3 | (t1|w3)&^t2) >> 63
+	w3 = t2
+	//
+	t1 = w4 + el
+	e1 = (w4&el | (w4|el)&^t1) >> 63
+	t2 = t1 + e2
+	e1 += (t1&e2 | (t1|e2)&^t2) >> 63
+	w4 = t2
+	el = e1
+
+	// i = 1
+	u = w1 * inp
+	//
+	e1, res = mul64(u, p0)
+	t1 = res + w1
+	e1 += (res&w1 | (res|w1)&^t1) >> 63
+	w1 = t1
+	//
+	e2, res = mul64(u, p1)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w2
+	e2 += (t1&w2 | (t1|w2)&^t2) >> 63
+	w2 = t2
+	//
+	e1, res = mul64(u, p2)
+	t1 = res + e2
+	e1 += (res&e2 | (res|e2)&^t1) >> 63
+	t2 = t1 + w3
+	e1 += (t1&w3 | (t1|w3)&^t2) >> 63
+	w3 = t2
+	//
+	e2, res = mul64(u, p3)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w4
+	e2 += (t1&w4 | (t1|w4)&^t2) >> 63
+	w4 = t2
+	//
+	t1 = w5 + el
+	e1 = (w5&el | (w5|el)&^t1) >> 63
+	t2 = t1 + e2
+	e1 += (t1&e2 | (t1|e2)&^t2) >> 63
+	w5 = t2
+	el = e1
+
+	// i = 2
+	u = w2 * inp
+	//
+	e1, res = mul64(u, p0)
+	t1 = res + w2
+	e1 += (res&w2 | (res|w2)&^t1) >> 63
+	w2 = t1
+	//
+	e2, res = mul64(u, p1)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w3
+	e2 += (t1&w3 | (t1|w3)&^t2) >> 63
+	w3 = t2
+	//
+	e1, res = mul64(u, p2)
+	t1 = res + e2
+	e1 += (res&e2 | (res|e2)&^t1) >> 63
+	t2 = t1 + w4
+	e1 += (t1&w4 | (t1|w4)&^t2) >> 63
+	w4 = t2
+	//
+	e2, res = mul64(u, p3)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w5
+	e2 += (t1&w5 | (t1|w5)&^t2) >> 63
+	w5 = t2
+	//
+	t1 = w6 + el
+	e1 = (w6&el | (w6|el)&^t1) >> 63
+	t2 = t1 + e2
+	e1 += (t1&e2 | (t1|e2)&^t2) >> 63
+	w6 = t2
+	el = e1
+
+	// i = 3
+	u = w3 * inp
+	//
+	e1, res = mul64(u, p0)
+	t1 = res + w3
+	e1 += (res&w3 | (res|w3)&^t1) >> 63
+	w3 = t1
+	//
+	e2, res = mul64(u, p1)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w4
+	e2 += (t1&w4 | (t1|w4)&^t2) >> 63
+	w4 = t2
+	//
+	e1, res = mul64(u, p2)
+	t1 = res + e2
+	e1 += (res&e2 | (res|e2)&^t1) >> 63
+	t2 = t1 + w5
+	e1 += (t1&w5 | (t1|w5)&^t2) >> 63
+	w5 = t2
+	//
+	e2, res = mul64(u, p3)
+	t1 = res + e1
+	e2 += (res&e1 | (res|e1)&^t1) >> 63
+	t2 = t1 + w6
+	e2 += (t1&w6 | (t1|w6)&^t2) >> 63
+	w6 = t2
+	//
+	t1 = w7 + el
+	e1 = (w7&el | (w7|el)&^t1) >> 63
+	t2 = t1 + e2
+	e1 += (t1&e2 | (t1|e2)&^t2) >> 63
+	w7 = t2
+
+	e1--
+	c[0] = w4 - ((p0) & ^e1)
+	e2 = (^w4&p0 | (^w4|p0)&c[0]) >> 63
+	c[1] = w5 - ((p1 + e2) & ^e1)
+	e2 = (^w5&p1 | (^w5|p1)&c[1]) >> 63
+	c[2] = w6 - ((p2 + e2) & ^e1)
+	e2 = (^w6&p2 | (^w6|p2)&c[2]) >> 63
+	c[3] = w7 - ((p3 + e2) & ^e1)
+
+	sub(c, c, modulus)
 }
