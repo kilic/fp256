@@ -1,4 +1,4 @@
-This library covers arithmetic operations for prime fields upto 256 bits in Go language. Field is implemented as 4 x 64 bit fashion. Currently, addition, subtraction, multiplication, squaring and inversion operations are supported. Multiplication, squaring and invertion operations are done in Montgomery space.
+This library contains arithmetic operations for prime fields upto 256 bit. Operations are optimized for AMD64 architecture.
 
 ### Usage
 
@@ -28,21 +28,14 @@ field.RandElement(fe2, rand.Reader)
 
 ### Benchmarks
 
-Prime field operations benchmarked on _2,7 GHz Intel Core i5_.
+Prime field operations benchmarked on _2,7 GHz i5_.
 
 ```
-BenchmarkFieldAddition                    14.1 ns/op
-BenchmarkFieldSubtraction                 13.1 ns/op
-BenchmarkFieldMontgomeryReduction         98.1 ns/op
-BenchmarkFieldMontgomeryMultiplication    170 ns/op
-BenchmarkFieldMontgomerySquaring          162 ns/op
-BenchmarkFieldInverse                     5202 ns/op
+BenchmarkAddition                      5.90 ns/op
+BenchmarkMontgomeryMultiplication      37.1 ns/op
+BenchmarkMontgomerySquaring            32.9 ns/op
+BenchmarkInvertion                     4743 ns/op
 ```
-
-### Todo
-
-* Exponentiation
-* Square Root
 
 ### References
 
