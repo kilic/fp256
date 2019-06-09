@@ -2,6 +2,7 @@ package fp
 
 import (
 	"encoding/binary"
+	"math/big"
 	"reflect"
 	"testing"
 )
@@ -208,5 +209,24 @@ func BenchmarkFieldInverseMontgomeryUp(t *testing.B) {
 	t.ResetTimer()
 	for i := 0; i < t.N; i++ {
 		field.InvMontUp(inv, a)
+	}
+}
+
+func BenchmarkBigIntInversion(t *testing.B) {
+	p := bigFromStr16(testmodulus)
+	a := bigFromStr16("0x6aaaaaaaaaaaaaaa44aa44aa44aa44aa91919191ffffff0000119999ffaa01aa")
+	c := new(big.Int)
+	for i := 0; i < t.N; i++ {
+		c.ModInverse(a, p)
+	}
+}
+
+func BenchmarkBigIntExponentiation(t *testing.B) {
+	p := bigFromStr16(testmodulus)
+	a := bigFromStr16("0x6aaaaaaaaaaaaaaa44aa44aa44aa44aa91919191ffffff0000119999ffaa01aa")
+	b := bigFromStr16("0x4fffffffffffffffdddddddd8888888888888888000000119a9a9a9a8b8b8b8b")
+	c := new(big.Int).Mul(a, b)
+	for i := 0; i < t.N; i++ {
+		c.Exp(a, b, p)
 	}
 }
