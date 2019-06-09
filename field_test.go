@@ -106,7 +106,7 @@ func TestFieldExponentiation(t *testing.T) {
 	field.Exp(a, a, x)
 	montmul(a, a, &FieldElement{1, 0, 0, 0})
 	e := fe(nil, "0x028c8f7ec1cebad4afe67cbfb965e72cf8f26f4219b47dd44f5990359c486c23")
-	if !e.eq(a) {
+	if !e.Eq(a) {
 		t.Errorf("exponentiation fails , have %s, want %s", a.String(), e.String())
 	}
 }
@@ -121,7 +121,7 @@ func TestFieldExponentiation2(t *testing.T) {
 	sub(p2, new(FieldElement).Unmarshal(p.Bytes()), &FieldElement{2, 0, 0, 0})
 	field.Exp(ai1, a, p2)
 	field.InvMontUp(ai2, a)
-	if !ai1.eq(ai2) {
+	if !ai1.Eq(ai2) {
 		t.Errorf("exponentiation fails , have %s, want %s", ai2.String(), ai1.String())
 	}
 }
@@ -133,7 +133,7 @@ func TestFieldInverseEuclid(t *testing.T) {
 	e := fe(nil, "0x27c28f49cabcf02ec28a6a44d07436e062d004894bffeeefa73ab2abc10f487f")
 	inv := new(FieldElement)
 	field.InvEEA(inv, a)
-	if !inv.eq(e) {
+	if !inv.Eq(e) {
 		t.Errorf("inversion fails (euclid), have %s, want %s", inv.String(), e.String())
 	}
 }
@@ -145,14 +145,14 @@ func TestFieldInverseMontgomeryDown(t *testing.T) {
 	e := fe(nil, "0x27c28f49cabcf02ec28a6a44d07436e062d004894bffeeefa73ab2abc10f487f")
 	inv := new(FieldElement)
 	field.InvMontDown(inv, a)
-	if !inv.eq(e) {
+	if !inv.Eq(e) {
 		t.Errorf("inversion fails (montgomery down), have %s, want %s", inv.String(), e.String())
 	}
 	a = fe(nil, "0x66ffeeeeddddccccffffeeeeddddcccc99aa99aa88bb88bb1919191928282828")
 	e = fe(field, "0x27c28f49cabcf02ec28a6a44d07436e062d004894bffeeefa73ab2abc10f487f")
 	inv = new(FieldElement)
 	field.InvMontDown(inv, a)
-	if !inv.eq(e) {
+	if !inv.Eq(e) {
 		t.Errorf("inversion fails (montgomery down), have %s, want %s", inv.String(), e.String())
 	}
 }
@@ -164,7 +164,7 @@ func TestFieldInverseMontgomeryUp(t *testing.T) {
 	e := fe(field, "0x27c28f49cabcf02ec28a6a44d07436e062d004894bffeeefa73ab2abc10f487f")
 	inv := new(FieldElement)
 	field.InvMontUp(inv, a)
-	if !inv.eq(e) {
+	if !inv.Eq(e) {
 		t.Errorf("inversion fails (montgomery up), have %s, want %s", inv.String(), e.String())
 	}
 }

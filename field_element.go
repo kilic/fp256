@@ -45,7 +45,7 @@ func (fe *FieldElement) Unmarshal(in []byte) *FieldElement {
 	return fe
 }
 
-func (fe *FieldElement) set(a *FieldElement) *FieldElement {
+func (fe *FieldElement) Set(a *FieldElement) *FieldElement {
 	fe[0] = a[0]
 	fe[1] = a[1]
 	fe[2] = a[2]
@@ -53,24 +53,29 @@ func (fe *FieldElement) set(a *FieldElement) *FieldElement {
 	return fe
 }
 
-func (fe *FieldElement) isEven() bool {
+func (fe *FieldElement) IsEven() bool {
 	const mask uint64 = 1
 	return fe[0]&mask == 0
 }
 
-func (fe *FieldElement) isOne() bool {
+func (fe *FieldElement) isOdd() bool {
+	const mask uint64 = 1
+	return fe[0]&mask != 0
+}
+
+func (fe *FieldElement) IsOne() bool {
 	return 1 == fe[0] && 0 == fe[1] && 0 == fe[2] && 0 == fe[3]
 }
 
-func (fe *FieldElement) isZero() bool {
+func (fe *FieldElement) IsZero() bool {
 	return 0 == fe[0] && 0 == fe[1] && 0 == fe[2] && 0 == fe[3]
 }
 
-func (fe *FieldElement) eq(e *FieldElement) bool {
+func (fe *FieldElement) Eq(e *FieldElement) bool {
 	return e[0] == fe[0] && e[1] == fe[1] && e[2] == fe[2] && e[3] == fe[3]
 }
 
-func (fe *FieldElement) cmp(fe2 *FieldElement) int64 {
+func (fe *FieldElement) Cmp(fe2 *FieldElement) int64 {
 	if fe[3] > fe2[3] {
 		return 1
 	} else if fe[3] < fe2[3] {

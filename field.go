@@ -72,7 +72,7 @@ func (f *Field) RandElement(fe *FieldElement, r io.Reader) error {
 		bytes[0] &= uint8(int(1<<b) - 1)
 		fe.Unmarshal(bytes)
 
-		if fe.cmp(&modulus) < 0 {
+		if fe.Cmp(&modulus) < 0 {
 			break
 		}
 	}
@@ -110,7 +110,7 @@ func (f *Field) Mul(c, a, b *FieldElement) {
 
 // Sets c as (a^e) modp
 func (f *Field) Exp(c, a, x *FieldElement) {
-	z := new(FieldElement).set(f.r1) // A
+	z := new(FieldElement).Set(f.r1) // A
 	var i uint64
 	for i = 255; i != 0xffffffffffffffff; i-- {
 		montmul(z, z, z)
@@ -118,7 +118,7 @@ func (f *Field) Exp(c, a, x *FieldElement) {
 			montmul(z, z, a)
 		}
 	}
-	c.set(z)
+	c.Set(z)
 }
 
 // Guide to Elliptic Curve Cryptography Algorithm
@@ -127,33 +127,33 @@ func (f *Field) Exp(c, a, x *FieldElement) {
 // Input: a
 // Output: a^-1
 func (f *Field) InvEEA(inv, fe *FieldElement) {
-	u := new(FieldElement).set(fe)
-	v := new(FieldElement).set(&modulus)
-	p := new(FieldElement).set(&modulus)
+	u := new(FieldElement).Set(fe)
+	v := new(FieldElement).Set(&modulus)
+	p := new(FieldElement).Set(&modulus)
 	x1 := &FieldElement{1, 0, 0, 0}
 	x2 := &FieldElement{0, 0, 0, 0}
 	var e uint64
 
-	for !u.isOne() && !v.isOne() {
-		for u.isEven() {
+	for !u.IsOne() && !v.IsOne() {
+		for u.IsEven() {
 			u.rightShift(0)
-			if x1.isEven() {
+			if x1.IsEven() {
 				x1.rightShift(0)
 			} else {
 				e = addn(x1, p)
 				x1.rightShift(e)
 			}
 		}
-		for v.isEven() {
+		for v.IsEven() {
 			v.rightShift(0)
-			if x2.isEven() {
+			if x2.IsEven() {
 				x2.rightShift(0)
 			} else {
 				addn(x2, p)
 				x2.rightShift(e)
 			}
 		}
-		if u.cmp(v) == -1 {
+		if u.Cmp(v) == -1 {
 			subn(v, u)
 			sub(x2, x2, x1)
 		} else {
@@ -161,11 +161,11 @@ func (f *Field) InvEEA(inv, fe *FieldElement) {
 			sub(x1, x1, x2)
 		}
 	}
-	if u.isOne() {
-		inv.set(x1)
+	if u.IsOne() {
+		inv.Set(x1)
 		return
 	}
-	inv.set(x2)
+	inv.Set(x2)
 }
 
 // Two phase Montgomery Modular Inverse
@@ -183,20 +183,20 @@ func (f *Field) InvEEA(inv, fe *FieldElement) {
 // Output : (a^-1)
 func (f *Field) InvMontDown(inv, fe *FieldElement) {
 
-	u := new(FieldElement).set(fe)
-	v := new(FieldElement).set(&modulus)
+	u := new(FieldElement).Set(fe)
+	v := new(FieldElement).Set(&modulus)
 	x1 := &FieldElement{1, 0, 0, 0}
 	x2 := &FieldElement{0, 0, 0, 0}
 	var k int
 	// Phase 1
-	for !v.isZero() {
-		if v.isEven() {
+	for !v.IsZero() {
+		if v.IsEven() {
 			v.rightShift(0)
 			x1.leftShift()
-		} else if u.isEven() {
+		} else if u.IsEven() {
 			u.rightShift(0)
 			x2.leftShift()
-		} else if v.cmp(u) == -1 {
+		} else if v.Cmp(u) == -1 {
 			subn(u, v)
 			u.rightShift(0)
 			addn(x1, x2)
@@ -213,14 +213,14 @@ func (f *Field) InvMontDown(inv, fe *FieldElement) {
 	k = k - 256
 	var e uint64
 	for i := 0; i < k; i++ {
-		if x1.isEven() {
+		if x1.IsEven() {
 			x1.rightShift(0)
 		} else {
 			e = addn(x1, &modulus)
 			x1.rightShift(e)
 		}
 	}
-	inv.set(x1)
+	inv.Set(x1)
 }
 
 // Inverse value stays in Montgomery space
@@ -235,21 +235,21 @@ func (f *Field) InvMontDown(inv, fe *FieldElement) {
 // Output : (a^-1)R
 func (f *Field) InvMontUp(inv, fe *FieldElement) {
 
-	u := new(FieldElement).set(fe)
-	v := new(FieldElement).set(&modulus)
+	u := new(FieldElement).Set(fe)
+	v := new(FieldElement).Set(&modulus)
 	x1 := &FieldElement{1, 0, 0, 0}
 	x2 := &FieldElement{0, 0, 0, 0}
 	var k int
 
 	// Phase 1
-	for !v.isZero() {
-		if v.isEven() {
+	for !v.IsZero() {
+		if v.IsEven() {
 			v.rightShift(0)
 			x1.leftShift()
-		} else if u.isEven() {
+		} else if u.IsEven() {
 			u.rightShift(0)
 			x2.leftShift()
-		} else if v.cmp(u) == -1 {
+		} else if v.Cmp(u) == -1 {
 			subn(u, v)
 			u.rightShift(0)
 			addn(x1, x2)
@@ -267,5 +267,5 @@ func (f *Field) InvMontUp(inv, fe *FieldElement) {
 	for i := k; i < 512; i++ {
 		double(x1, x1)
 	}
-	inv.set(x1)
+	inv.Set(x1)
 }

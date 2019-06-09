@@ -17,7 +17,7 @@ func TestBoxFieldELementByteInOut(t *testing.T) {
 		a.Marshal(bytes)
 		field.Mul(a, a, field.r2)
 		b = field.NewElement(bytes)
-		if !b.eq(a) {
+		if !b.Eq(a) {
 			t.Errorf("bad byte conversion in:%s, out:%s",
 				a.String(), b.String())
 			return
@@ -37,7 +37,7 @@ func TestBoxAdditiveAssoc(t *testing.T) {
 		field.Add(&u, &u, &c)
 		field.Add(&v, &b, &c)
 		field.Add(&v, &v, &a)
-		if !u.eq(&v) {
+		if !u.Eq(&v) {
 			t.Errorf("additive associativity does not hold a:%s, b:%s, c:%s, u:%s, v:%s",
 				a.String(), b.String(), c.String(), u.String(), v.String())
 			return
@@ -57,7 +57,7 @@ func TestBoxSubractiveAssoc(t *testing.T) {
 		field.Sub(&u, &u, &b)
 		field.Sub(&v, &a, &b)
 		field.Sub(&v, &v, &c)
-		if !u.eq(&v) {
+		if !u.Eq(&v) {
 			t.Errorf("subtractive associativity does not hold a:%s, b:%s, c:%s, u:%s, v:%s",
 				a.String(), b.String(), c.String(), u.String(), v.String())
 			return
@@ -77,7 +77,7 @@ func TestBoxMultiplicativeAssoc(t *testing.T) {
 		field.Mul(&u, &u, &c)
 		field.Mul(&v, &b, &c)
 		field.Mul(&v, &v, &a)
-		if !u.eq(&v) {
+		if !u.Eq(&v) {
 			t.Errorf("multiplicative associativity does not hold a:%s, b:%s, c:%s, u:%s, v:%s",
 				a.String(), b.String(), c.String(), u.String(), v.String())
 			return
@@ -94,7 +94,7 @@ func TestBoxAdditiveCommutativity(t *testing.T) {
 		field.RandElement(&b, rand.Reader)
 		field.Add(&u, &a, &b)
 		field.Add(&v, &b, &a)
-		if !u.eq(&v) {
+		if !u.Eq(&v) {
 			t.Errorf("additive commutativity  does not hold a:%s, b:%s, u:%s",
 				a.String(), b.String(), u.String())
 			return
@@ -111,7 +111,7 @@ func TestBoxMultiplicativeCommutativity(t *testing.T) {
 		field.RandElement(&b, rand.Reader)
 		field.Mul(&u, &a, &b)
 		field.Mul(&v, &b, &a)
-		if !u.eq(&v) {
+		if !u.Eq(&v) {
 			t.Errorf("multiplicative commutativity does not hold a:%s, b:%s, u:%s",
 				a.String(), b.String(), u.String())
 			return
@@ -127,7 +127,7 @@ func TestBoxSquare(t *testing.T) {
 		field.RandElement(&a, rand.Reader)
 		field.Square(&b, &a)
 		field.Mul(&c, &a, &a)
-		if !c.eq(&b) {
+		if !c.Eq(&b) {
 			t.Errorf("bad squaring, have: %s, want: %s", c.String(), b.String())
 			return
 		}
@@ -145,7 +145,7 @@ func TestBoxNegation(t *testing.T) {
 		field.Neg(&a, &a)
 		field.Neg(&b, &b)
 		field.Sub(&v, &b, &a)
-		if !u.eq(&v) {
+		if !u.Eq(&v) {
 			t.Errorf("subtraction check does not hold a:%s, b:%s, u:%s",
 				a.String(), b.String(), u.String())
 			return
@@ -162,7 +162,7 @@ func TestBoxNegation2(t *testing.T) {
 		field.RandElement(&a, rand.Reader)
 		field.Neg(&b, &a)
 		field.Add(&c, &a, &b)
-		if !zero.eq(&c) {
+		if !zero.Eq(&c) {
 			t.Errorf("bad negation a:%s, b:%s",
 				a.String(), b.String())
 			return
@@ -179,7 +179,7 @@ func TestBoxDoubling(t *testing.T) {
 		field.RandElement(&a, rand.Reader)
 		field.Double(&b, &a)
 		field.Mul(&c, &a, &monttwo)
-		if !b.eq(&c) {
+		if !b.Eq(&c) {
 			t.Errorf("bad doubling c:%s, b:%s",
 				c.String(), b.String())
 			return
@@ -196,12 +196,12 @@ func TestBoxAdditiveIdentity(t *testing.T) {
 	for i := 0; i < nBox; i++ {
 		field.RandElement(&a, rand.Reader)
 		field.Add(&c, &a, identity)
-		if !c.eq(&a) {
+		if !c.Eq(&a) {
 			t.Errorf("additive identity does not hold, have: %s, want: %s", c.String(), a.String())
 			return
 		}
 		field.Add(&a, &c, identity)
-		if !c.eq(&a) {
+		if !c.Eq(&a) {
 			t.Errorf("additive identity does not hold, have: %s, want: %s", c.String(), a.String())
 			return
 		}
@@ -217,12 +217,12 @@ func TestBoxMultiplicativeIdentity(t *testing.T) {
 	for i := 0; i < nBox; i++ {
 		field.RandElement(&a, rand.Reader)
 		field.Mul(&c, &a, identity)
-		if !c.eq(&a) {
+		if !c.Eq(&a) {
 			t.Errorf("multiplicative identity does not hold, have: %s, want: %s", c.String(), a.String())
 			return
 		}
 		field.Mul(&a, &c, identity)
-		if !c.eq(&a) {
+		if !c.Eq(&a) {
 			t.Errorf("multiplicative identity does not hold, have: %s, want: %s", c.String(), a.String())
 			return
 		}
@@ -238,7 +238,7 @@ func TestBoxInverseDown(t *testing.T) {
 		field.RandElement(&a, rand.Reader)
 		field.InvMontDown(&b, &a)
 		field.Mul(&c, &b, &a)
-		if !c.eq(e) {
+		if !c.Eq(e) {
 			t.Errorf("bad montgomery downgrade inversion have: %s, want: %s", c.String(), e.String())
 			return
 		}
@@ -254,7 +254,7 @@ func TestBoxInverse(t *testing.T) {
 		field.RandElement(&a, rand.Reader)
 		field.InvMontUp(&b, &a)
 		field.Mul(&c, &b, &a)
-		if !c.eq(e) {
+		if !c.Eq(e) {
 			t.Errorf("bad montgomery upgrade inversion, have: %s, want: %s", c.String(), e.String())
 			return
 		}
@@ -271,7 +271,7 @@ func TestBoxExp(t *testing.T) {
 		field.RandElement(&a, rand.Reader)
 		field.Exp(&ai1, &a, p2)
 		field.InvMontUp(&ai2, &a)
-		if !ai1.eq(&ai2) {
+		if !ai1.Eq(&ai2) {
 			t.Errorf("exponentiation fails , have %s, want %s", ai2.String(), ai1.String())
 			return
 		}
