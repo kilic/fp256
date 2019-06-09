@@ -3,13 +3,6 @@
 #include "textflag.h"
 #include "arithmetic.h"
 
-// TEXT ·xxx(SB), NOSPLIT, $0-24
-// 	MOVQ a+0(FP), DI
-// 	MOVQ b+8(FP), SI
-// 	MOVQ SI, 0(DI)
-// 	MOVQ $99, ret+16(FP)
-// 	RET
-
 TEXT ·double(SB), NOSPLIT, $0-16
   MOVQ a+8(FP), DI
 	MOVQ 0(DI), R8
