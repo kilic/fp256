@@ -260,3 +260,20 @@ func TestBoxInverse(t *testing.T) {
 		}
 	}
 }
+
+func TestBoxExp(t *testing.T) {
+	p := bigFromStr16(testmodulus)
+	field := NewField(p)
+	p2 := new(FieldElement)
+	sub(p2, new(FieldElement).Unmarshal(p.Bytes()), &FieldElement{2, 0, 0, 0})
+	var ai1, ai2, a FieldElement
+	for i := 0; i < nBox; i++ {
+		field.RandElement(&a, rand.Reader)
+		field.Exp(&ai1, &a, p2)
+		field.InvMontUp(&ai2, &a)
+		if !ai1.eq(&ai2) {
+			t.Errorf("exponentiation fails , have %s, want %s", ai2.String(), ai1.String())
+			return
+		}
+	}
+}

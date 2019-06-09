@@ -7,7 +7,8 @@ This library covers arithmetic operations for prime fields upto 256 bits in Go l
 New field can be created from standart big.Int prime number. Montgomery constants are precomputed during construction of new field.
 
 ```go
-pBig := new(big.Int).SetString("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001",16)
+pStr = "0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001"
+pBig := new(big.Int).SetString(pStr[:2],16)
 field := NewField(pBig)
 ```
 

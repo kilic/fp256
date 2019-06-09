@@ -179,6 +179,7 @@ func BenchmarkExponentiation(t *testing.B) {
 		field.Exp(a, a, x)
 	}
 }
+
 func BenchmarkFieldInverseEuclid(t *testing.B) {
 	p := bigFromStr16(testmodulus)
 	field := NewField(p)
