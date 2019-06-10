@@ -1,6 +1,7 @@
 package fp
 
 import (
+	"encoding/hex"
 	"fmt"
 )
 
@@ -45,6 +46,32 @@ func (fe *FieldElement) Unmarshal(in []byte) *FieldElement {
 	return fe
 }
 
+func (fe *FieldElement) SetString(field *Field, s string) error {
+	if s[:2] == "0x" {
+		s = s[2:]
+	}
+	h, err := hex.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	if field != nil {
+		montmul(fe, fe, field.r2)
+		return nil
+	}
+	fe.Unmarshal(h)
+	return nil
+}
+
+func (fe *FieldElement) SetUint(field *Field, a uint64) {
+	fe[0] = a
+	fe[1] = 0
+	fe[2] = 0
+	fe[3] = 0
+	if field != nil {
+		montmul(fe, fe, field.r2)
+	}
+}
+
 func (fe *FieldElement) Set(a *FieldElement) *FieldElement {
 	fe[0] = a[0]
 	fe[1] = a[1]
@@ -58,7 +85,7 @@ func (fe *FieldElement) IsEven() bool {
 	return fe[0]&mask == 0
 }
 
-func (fe *FieldElement) isOdd() bool {
+func (fe *FieldElement) IsOdd() bool {
 	const mask uint64 = 1
 	return fe[0]&mask != 0
 }
