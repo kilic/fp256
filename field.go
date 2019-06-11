@@ -1,6 +1,7 @@
 package fp
 
 import (
+	"encoding/hex"
 	"io"
 	"math/big"
 	"math/bits"
@@ -48,6 +49,28 @@ func (f *Field) NewElement(in []byte) *FieldElement {
 	fe := new(FieldElement).Unmarshal(in)
 	f.Mul(fe, fe, f.r2)
 	return fe
+}
+
+func (f *Field) NewElementFromUint(in uint64) *FieldElement {
+	fe := &FieldElement{in, 0, 0, 0}
+	if in == 0 {
+		return fe
+	}
+	montmul(fe, fe, f.r2)
+	return fe
+}
+
+func (f *Field) NewElementFromString(in string) (*FieldElement, error) {
+	if in[:2] == "0x" {
+		in = in[2:]
+	}
+	h, err := hex.DecodeString(in)
+	if err != nil {
+		return nil, err
+	}
+	fe := new(FieldElement).Unmarshal(h)
+	montmul(fe, fe, f.r2)
+	return fe, nil
 }
 
 // Adapted from https://github.com/golang/go/blob/master/src/crypto/rand/util.go
