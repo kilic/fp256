@@ -102,6 +102,15 @@ func (f *Field) RandElement(fe *FieldElement, r io.Reader) error {
 	return nil
 }
 
+func (f *Field) Mont(c, a *FieldElement) {
+	montmul(c, a, f.r2)
+}
+
+func (f *Field) Demont(c, a *FieldElement) {
+	//mont(c, &[8]uint64{a[0], a[1], a[2], a[3], 0, 0, 0, 0})
+	montmul(c, a, &FieldElement{1, 0, 0, 0})
+}
+
 // c = (a + b) modp
 func (f *Field) Add(c, a, b *FieldElement) {
 	add(c, a, b)
