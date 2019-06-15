@@ -54,11 +54,11 @@ func (fe *FieldElement) SetString(field *Field, s string) (*FieldElement, error)
 	if err != nil {
 		return nil, err
 	}
+	fe.Unmarshal(h)
 	if field != nil {
 		montmul(fe, fe, field.r2)
 		return fe, nil
 	}
-	fe.Unmarshal(h)
 	return fe, nil
 }
 
