@@ -34,3 +34,6 @@ func square(w *[8]uint64, a *FieldElement)
 
 // go:noescape
 func montsquare(c, a *FieldElement)
+
+// go:noescape
+func inverse(c, a *FieldElement)

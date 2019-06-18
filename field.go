@@ -266,38 +266,38 @@ func (f *Field) InvMontDown(inv, fe *FieldElement) {
 // Input : aR
 // Output : (a^-1)R
 func (f *Field) InvMontUp(inv, fe *FieldElement) {
+	inverse(inv, fe)
+	// u := new(FieldElement).Set(fe)
+	// v := new(FieldElement).Set(&modulus)
+	// x1 := &FieldElement{1, 0, 0, 0}
+	// x2 := &FieldElement{0, 0, 0, 0}
+	// var k int
 
-	u := new(FieldElement).Set(fe)
-	v := new(FieldElement).Set(&modulus)
-	x1 := &FieldElement{1, 0, 0, 0}
-	x2 := &FieldElement{0, 0, 0, 0}
-	var k int
-
-	// Phase 1
-	for !v.IsZero() {
-		if v.IsEven() {
-			v.rightShift(0)
-			x1.leftShift()
-		} else if u.IsEven() {
-			u.rightShift(0)
-			x2.leftShift()
-		} else if v.Cmp(u) == -1 {
-			subn(u, v)
-			u.rightShift(0)
-			addn(x1, x2)
-			x2.leftShift()
-		} else {
-			subn(v, u)
-			v.rightShift(0)
-			addn(x2, x1)
-			x1.leftShift()
-		}
-		k = k + 1
-	}
-	// Phase2
-	sub(x1, x1, &modulus)
-	for i := k; i < 512; i++ {
-		double(x1, x1)
-	}
-	inv.Set(x1)
+	// // Phase 1
+	// for !v.IsZero() {
+	// 	if v.IsEven() {
+	// 		v.rightShift(0)
+	// 		x1.leftShift()
+	// 	} else if u.IsEven() {
+	// 		u.rightShift(0)
+	// 		x2.leftShift()
+	// 	} else if v.Cmp(u) == -1 {
+	// 		subn(u, v)
+	// 		u.rightShift(0)
+	// 		addn(x1, x2)
+	// 		x2.leftShift()
+	// 	} else {
+	// 		subn(v, u)
+	// 		v.rightShift(0)
+	// 		addn(x2, x1)
+	// 		x1.leftShift()
+	// 	}
+	// 	k = k + 1
+	// }
+	// // Phase2
+	// sub(x1, x1, &modulus)
+	// for i := k; i < 512; i++ {
+	// 	double(x1, x1)
+	// }
+	// inv.Set(x1)
 }
