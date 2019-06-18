@@ -34,7 +34,7 @@ Prime field operations benchmarked on _2,7 GHz i5_.
 BenchmarkAddition                      5.90 ns/op
 BenchmarkMontgomeryMultiplication      37.1 ns/op
 BenchmarkMontgomerySquaring            32.9 ns/op
-BenchmarkInvertion                     4743 ns/op
+BenchmarkInvertion                     2829 ns/op
 ```
 
 ### References
