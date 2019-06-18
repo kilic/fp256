@@ -1,3 +1,78 @@
+#define move(src, dest)   \
+  MOVQ 0+src, R8          \
+  MOVQ R8, 0+dest         \
+  MOVQ 8+src, R8          \
+  MOVQ R8, 8+dest         \
+  MOVQ 16+src, R8         \
+  MOVQ R8, 16+dest        \
+  MOVQ 24+src, R8         \
+  MOVQ R8, 24+dest        \
+
+#define clear(ra)         \
+  MOVQ $0, 0+ra           \
+  MOVQ $0, 8+ra           \
+  MOVQ $0, 16+ra          \
+  MOVQ $0, 24+ra          \
+
+#define rsh(ra)           \
+  SHRQ $1, 24+ra          \
+  RCRQ $1, 16+ra          \
+  RCRQ $1, 8+ra           \
+  RCRQ $1, 0+ra           \
+
+#define lsh(ra)           \
+  SHLQ $1, 0+ra           \
+  RCLQ $1, 8+ra           \
+  RCLQ $1, 16+ra          \
+  RCLQ $1, 24+ra          \
+
+#define iszero(ra)        \
+  XORQ R8, R8             \
+  ORQ 0+ra, R8            \
+  ORQ 8+ra, R8            \
+  ORQ 16+ra, R8           \
+  ORQ 24+ra, R8           \
+  TESTQ R8, R8            \
+
+// makes LS true if cond met
+#define lt(ra,rb)         \
+  MOVQ 0+ra, R8           \
+  SUBQ 0+rb, R8           \
+  MOVQ 8+ra, R8           \
+  SBBQ 8+rb, R8           \
+  MOVQ 16+ra, R8          \
+  SBBQ 16+rb, R8          \
+  MOVQ 24+ra, R8          \
+  SBBQ 24+rb, R8          \
+
+#define addn(ra,rb)       \
+	MOVQ 0+ra, R8           \
+	MOVQ 8+ra, R9           \
+	MOVQ 16+ra, R10         \
+	MOVQ 24+ra, R11         \
+	ADDQ 0+rb, R8           \
+	ADCQ 8+rb, R9           \
+	ADCQ 16+rb, R10         \
+	ADCQ 24+rb, R11         \
+	MOVQ R8, 0+ra           \
+	MOVQ R9, 8+ra           \
+	MOVQ R10, 16+ra         \
+	MOVQ R11, 24+ra         \
+
+#define subn(ra, rb)      \
+	MOVQ 0+ra, R8           \
+	MOVQ 8+ra, R9           \
+	MOVQ 16+ra, R10         \
+	MOVQ 24+ra, R11         \
+	SUBQ  0+rb, R8          \
+	SBBQ  8+rb, R9          \
+	SBBQ 16+rb, R10         \
+	SBBQ 24+rb, R11         \
+	MOVQ R8, 0+ra           \
+	MOVQ R9, 8+ra           \
+	MOVQ R10, 16+ra         \
+	MOVQ R11, 24+ra         \
+
 #define mul(rc, ra, rb) \
   XORQ R10, R10 \
 	XORQ R11, R11 \
