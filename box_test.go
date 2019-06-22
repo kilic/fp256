@@ -16,7 +16,7 @@ func TestBoxFieldELementByteInOut(t *testing.T) {
 		field.RandElement(a, rand.Reader)
 		a.Marshal(bytes)
 		field.Mul(a, a, field.r2)
-		b = field.NewElement(bytes)
+		b = field.NewElementFromBytes(bytes)
 		if !b.Eq(a) {
 			t.Errorf("bad byte conversion in:%s, out:%s",
 				a.String(), b.String())

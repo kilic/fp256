@@ -22,6 +22,7 @@ type Field struct {
 	r1  *FieldElement
 	r2  *FieldElement
 	r3  *FieldElement
+	P   *FieldElement
 }
 
 // Given prime number as big.Int,
@@ -41,11 +42,12 @@ func NewField(pBig *big.Int) *Field {
 		rN1: rN1,
 		r2:  r2,
 		r3:  r3,
+		P:   &modulus,
 	}
 }
 
 // Returns new element in Montgomery domain
-func (f *Field) NewElement(in []byte) *FieldElement {
+func (f *Field) NewElementFromBytes(in []byte) *FieldElement {
 	fe := new(FieldElement).Unmarshal(in)
 	f.Mul(fe, fe, f.r2)
 	return fe
@@ -73,13 +75,23 @@ func (f *Field) NewElementFromString(in string) (*FieldElement, error) {
 	return fe, nil
 }
 
+func (f *Field) Zero() *FieldElement {
+	return new(FieldElement).SetUint(0)
+}
+
+func (f *Field) One() *FieldElement {
+	return new(FieldElement).Set(f.r1)
+}
+
+func (f *Field) Copy(dst *FieldElement, src *FieldElement) *FieldElement {
+	return dst.Set(src)
+}
+
 // Adapted from https://github.com/golang/go/blob/master/src/crypto/rand/util.go
 func (f *Field) RandElement(fe *FieldElement, r io.Reader) error {
-	// assuming p > 2^192
+
 	bitLen := bits.Len64(modulus[3]) + 64 + 64 + 64
-	// k is the maximum byte length needed to encode a value < max.
 	k := (bitLen + 7) / 8
-	// b is the number of bits in the most significant byte of max-1.
 	b := uint(bitLen % 8)
 	if b == 0 {
 		b = 8
@@ -90,8 +102,6 @@ func (f *Field) RandElement(fe *FieldElement, r io.Reader) error {
 		if err != nil {
 			return err
 		}
-		// Clear bits in the first byte to increase the probability
-		// that the candidate is < max.
 		bytes[0] &= uint8(int(1<<b) - 1)
 		fe.Unmarshal(bytes)
 
@@ -107,8 +117,8 @@ func (f *Field) Mont(c, a *FieldElement) {
 }
 
 func (f *Field) Demont(c, a *FieldElement) {
-	//mont(c, &[8]uint64{a[0], a[1], a[2], a[3], 0, 0, 0, 0})
-	montmul(c, a, &FieldElement{1, 0, 0, 0})
+	//montmul(c, a, &FieldElement{1, 0, 0, 0})
+	mont(c, &[8]uint64{a[0], a[1], a[2], a[3], 0, 0, 0, 0})
 }
 
 // c = (a + b) modp

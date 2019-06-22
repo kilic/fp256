@@ -19,7 +19,7 @@ New field element can be created using bytes input. Given 32 bytes input new fie
 ```go
 // input bytes with big endian order
 feBytes := []byte{12, 14, 250, ... }
-fe := field.NewElement(fe)
+fe := field.NewElementFromBytes(feBytes)
 
 // random element
 fe2 := new(FieldElement)

@@ -15,7 +15,7 @@ func fe(field *Field, s string) *FieldElement {
 	if field == nil {
 		return new(FieldElement).Unmarshal(h)
 	}
-	return field.NewElement(h)
+	return field.NewElementFromBytes(h)
 }
 
 var (
