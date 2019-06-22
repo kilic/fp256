@@ -46,7 +46,7 @@ func (fe *FieldElement) Unmarshal(in []byte) *FieldElement {
 	return fe
 }
 
-func (fe *FieldElement) SetString(field *Field, s string) (*FieldElement, error) {
+func (fe *FieldElement) SetString(s string) (*FieldElement, error) {
 	if s[:2] == "0x" {
 		s = s[2:]
 	}
@@ -54,22 +54,22 @@ func (fe *FieldElement) SetString(field *Field, s string) (*FieldElement, error)
 	if err != nil {
 		return nil, err
 	}
-	fe.Unmarshal(h)
-	if field != nil {
-		montmul(fe, fe, field.r2)
-		return fe, nil
-	}
-	return fe, nil
+	return fe.Unmarshal(h), nil
+	// if field != nil {
+	// 	montmul(fe, fe, field.r2)
+	// 	return fe, nil
+	// }
+	// return fe, nil
 }
 
-func (fe *FieldElement) SetUint(field *Field, a uint64) *FieldElement {
+func (fe *FieldElement) SetUint(a uint64) *FieldElement {
 	fe[0] = a
 	fe[1] = 0
 	fe[2] = 0
 	fe[3] = 0
-	if field != nil {
-		montmul(fe, fe, field.r2)
-	}
+	// if field != nil {
+	// 	montmul(fe, fe, field.r2)
+	// }
 	return fe
 }
 
