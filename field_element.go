@@ -12,7 +12,7 @@ func (fe *FieldElement) String() string {
 }
 
 // Doesn't apply montgomery reduction
-func (fe *FieldElement) Marshal(out []byte) {
+func (fe *FieldElement) Marshal(out []byte) []byte {
 	var a int
 	for i := 0; i < 4; i++ {
 		a = 31 - i*8
@@ -25,6 +25,7 @@ func (fe *FieldElement) Marshal(out []byte) {
 		out[a-6] = byte(fe[i] >> 48)
 		out[a-7] = byte(fe[i] >> 56)
 	}
+	return out
 }
 
 // Doesn't apply montgomery encoding
